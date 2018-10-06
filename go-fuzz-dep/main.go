@@ -13,7 +13,7 @@ import (
 
 var (
 	CoverTab    *[CoverSize]byte
-    CoverTabTmp [CoverSize]byte
+	CoverTabTmp [CoverSize]byte
 )
 
 
@@ -22,9 +22,9 @@ func init() {
 }
 
 func Initialize(coverTabPtr unsafe.Pointer, coverTabSize uint64) {
-    if coverTabSize != CoverSize {
-        panic("Incorrect cover tab size")
-    }
+	if coverTabSize != CoverSize {
+	    panic("Incorrect cover tab size")
+	}
 	CoverTab = (*[CoverSize]byte)(coverTabPtr)
 }
 

@@ -16,12 +16,12 @@ typedef int memcmp_cb_t(void*, const void*, const void*, size_t n);
 
 static void callMemcmpCB(void* CBPtr, size_t ID, unsigned char* data1, size_t size1, unsigned char* data2, size_t size2)
 {
-    if ( CBPtr == NULL ) {
-        return;
-    }
-    memcmp_cb_t* CB = (memcmp_cb_t*)CBPtr;
-    const size_t minsize = size1 < size2 ? size1 : size2;
-    CB((void*)ID, data1, data2, minsize);
+	if ( CBPtr == NULL ) {
+	    return;
+	}
+	memcmp_cb_t* CB = (memcmp_cb_t*)CBPtr;
+	const size_t minsize = size1 < size2 ? size1 : size2;
+	CB((void*)ID, data1, data2, minsize);
 }
 
 */
@@ -43,32 +43,32 @@ type iface struct {
 var memcmpCB unsafe.Pointer
 
 func SetMemcmpCBPtr(ptr unsafe.Pointer) {
-    memcmpCB = ptr
+	memcmpCB = ptr
 }
 
 func Sonar(v1, v2 interface{}, id uint32) {
 	var serialized1 [2*SonarMaxLen]byte
 	var serialized2 [2*SonarMaxLen]byte
-    n1, _ := serialize(v1, v2, serialized1[:])
+	n1, _ := serialize(v1, v2, serialized1[:])
 	if n1 == failure {
 		return
 	}
-    s1 := serialized1[:n1]
+	s1 := serialized1[:n1]
 
-    n2, _ := serialize(v2, v1, serialized2[:])
+	n2, _ := serialize(v2, v1, serialized2[:])
 	if n2 == failure {
 		return
 	}
-    s2 := serialized2[:n2]
+	s2 := serialized2[:n2]
 
-    if len(s1) == 0 || len(s2) == 0 {
-        return
-    }
-    C.callMemcmpCB(
-        memcmpCB,
-        C.ulong(id),
-        (*C.uchar)(unsafe.Pointer(&s1[0])), C.ulong(len(s1)),
-        (*C.uchar)(unsafe.Pointer(&s2[0])), C.ulong(len(s2)))
+	if len(s1) == 0 || len(s2) == 0 {
+	    return
+	}
+	C.callMemcmpCB(
+	    memcmpCB,
+	    C.ulong(id),
+	    (*C.uchar)(unsafe.Pointer(&s1[0])), C.ulong(len(s1)),
+	    (*C.uchar)(unsafe.Pointer(&s2[0])), C.ulong(len(s2)))
 }
 
 func serialize(v, v2 interface{}, buf []byte) (n, flags uint8) {
