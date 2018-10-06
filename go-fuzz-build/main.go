@@ -101,7 +101,6 @@ func main() {
 	var re = regexp.MustCompile(`[^a-zA-Z0-9]`)
 	outf := re.ReplaceAllString(pkg, `_`) + ".a"
 	buildInstrumentedBinary(outf, pkg, deps, lits, &blocks, &sonar)
-	createMeta(lits, blocks, sonar)
 }
 
 func testNormalBuild(pkg string) {
@@ -131,20 +130,6 @@ func testNormalBuild(pkg string) {
 	if out, err := cmd.CombinedOutput(); err != nil {
 		failf("failed to execute go build: %v\n%v", err, string(out))
 	}
-}
-
-func createMeta(lits map[Literal]struct{}, blocks []CoverBlock, sonar []CoverBlock) string {
-	meta := MetaData{Blocks: blocks, Sonar: sonar}
-	for k := range lits {
-		meta.Literals = append(meta.Literals, k)
-	}
-	data, err := json.Marshal(meta)
-	if err != nil {
-		failf("failed to serialize meta information: %v", err)
-	}
-	f := "metadata"
-	writeFile(f, data)
-	return f
 }
 
 func buildInstrumentedBinary(outf string, pkg string, deps map[string]bool, lits map[Literal]struct{}, blocks *[]CoverBlock, sonar *[]CoverBlock) string {
