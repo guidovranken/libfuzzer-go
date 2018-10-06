@@ -97,7 +97,10 @@ func main() {
 	lits := make(map[Literal]struct{})
 	var blocks []CoverBlock
 	var sonar []CoverBlock
-	buildInstrumentedBinary("instrumented.a", pkg, deps, lits, &blocks, &sonar)
+
+	var re = regexp.MustCompile(`[^a-zA-Z0-9]`)
+	outf := re.ReplaceAllString(pkg, `_`) + ".a"
+	buildInstrumentedBinary(outf, pkg, deps, lits, &blocks, &sonar)
 	createMeta(lits, blocks, sonar)
 }
 
