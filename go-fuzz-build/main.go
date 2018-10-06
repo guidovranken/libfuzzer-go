@@ -16,6 +16,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -95,7 +96,7 @@ func main() {
 
 	lits := make(map[Literal]struct{})
 	var blocks []CoverBlock
-    var sonar []CoverBlock
+	var sonar []CoverBlock
 	buildInstrumentedBinary("instrumented.a", pkg, deps, lits, &blocks, &sonar)
 	createMeta(lits, blocks, sonar)
 }
@@ -138,7 +139,7 @@ func createMeta(lits map[Literal]struct{}, blocks []CoverBlock, sonar []CoverBlo
 	if err != nil {
 		failf("failed to serialize meta information: %v", err)
 	}
-    f := "metadata"
+	f := "metadata"
 	writeFile(f, data)
 	return f
 }
@@ -311,9 +312,9 @@ func instrumentPackages(workdir string, deps map[string]bool, lits map[Literal]s
 				pkgs[imp] = p1
 			}
 			p.nimport++
-            if p.name != "runtime/cgo" {
-                unresolved[p.name] = true
-            }
+	        if p.name != "runtime/cgo" {
+	            unresolved[p.name] = true
+	        }
 			p1.deps = append(p1.deps, p)
 		}
 		if p.nimport == 0 {
@@ -384,17 +385,17 @@ func instrumentPackages(workdir string, deps map[string]bool, lits map[Literal]s
 		for _, p1 := range p.deps {
 			p1.nimport--
 			if p1.nimport == 0 {
-                unresolved[p1.name] = false
+	            unresolved[p1.name] = false
 				ready = append(ready, p1)
 			}
 		}
 	}
 
 	for k, isUnresolved := range unresolved {
-        if isUnresolved {
-            fmt.Printf("Warning - uninstrumented package: %v\n", k)
-        }
-    }
+	    if isUnresolved {
+	        fmt.Printf("Warning - uninstrumented package: %v\n", k)
+	    }
+	}
 }
 
 func copyDir(dir, newDir string, rec bool, pred func(string) bool) {
@@ -519,21 +520,21 @@ var mainSrc = `
 package main
 
 import (
-    "C"
-    "unsafe"
+	"C"
+	"unsafe"
 	target "%v"
 	dep "go-fuzz-dep"
 )
 
 //export fuzzer_run
 func fuzzer_run(input []byte) {
-    target.Fuzz(input)
+	target.Fuzz(input)
 }
 
 //export fuzzer_init
 func fuzzer_init(coverTabPtr unsafe.Pointer, coverTabSize uint64, memcmpCBPtr unsafe.Pointer) {
-    dep.Initialize(coverTabPtr, coverTabSize)
-    dep.SetMemcmpCBPtr(memcmpCBPtr)
+	dep.Initialize(coverTabPtr, coverTabSize)
+	dep.SetMemcmpCBPtr(memcmpCBPtr)
 }
 
 func main() {
