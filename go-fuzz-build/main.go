@@ -97,8 +97,13 @@ func main() {
 	var blocks []CoverBlock
 	var sonar []CoverBlock
 
-	var re = regexp.MustCompile(`[^a-zA-Z0-9]`)
-	outf := re.ReplaceAllString(pkg, `_`) + ".a"
+	var outf string
+	if len(*flagOut) > 0 {
+	    outf = *flagOut
+	} else {
+	    var re = regexp.MustCompile(`[^a-zA-Z0-9]`)
+	    outf = re.ReplaceAllString(pkg, `_`) + ".a"
+	}
 	buildInstrumentedBinary(outf, pkg, deps, lits, &blocks, &sonar)
 }
 
