@@ -26,6 +26,9 @@ var (
 	flagTag  = flag.String("tags", "", "a space-separated list of build tags to consider satisfied during the build")
 	flagOut  = flag.String("o", "", "output file")
 	flagWork = flag.Bool("work", false, "don't remove working directory")
+	flagMainSrc  = flag.String("mainsrc", "", "Main source (file)")
+
+	mainSrcOverride = ""
 
 	workdir string
 	GOROOT  string
@@ -104,6 +107,15 @@ func main() {
 	    var re = regexp.MustCompile(`[^a-zA-Z0-9]`)
 	    outf = re.ReplaceAllString(pkg, `_`) + ".a"
 	}
+
+	if len(*flagMainSrc) > 0 {
+	    b, err := ioutil.ReadFile(*flagMainSrc)
+	    if err != nil {
+	        failf("failed to read main source file : %v\n", err)
+	    }
+	    mainSrcOverride = string(b)
+	}
+
 	buildInstrumentedBinary(outf, pkg, deps, lits, &blocks, &sonar)
 }
 
@@ -193,7 +205,12 @@ func createFuzzMain(pkg string) string {
 	mainPkg := filepath.Join(pkg, "go.fuzz.main")
 	path := filepath.Join(workdir, "gopath", "src", mainPkg)
 	mkdirAll(path)
-	src := fmt.Sprintf(mainSrc, pkg)
+	var src string
+	if len(mainSrcOverride) > 0 {
+	    src = fmt.Sprintf(mainSrcOverride, pkg)
+	} else {
+	    src = fmt.Sprintf(mainSrc, pkg)
+	}
 	writeFile(filepath.Join(path, "main.go"), []byte(src))
 	return mainPkg
 }
