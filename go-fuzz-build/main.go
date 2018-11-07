@@ -50,6 +50,14 @@ func main() {
 	if len(flag.Args()) != 1 || len(flag.Arg(0)) == 0 {
 		failf("usage: go-fuzz-build pkg")
 	}
+	if len(*flagMainSrc) > 0 {
+	    b, err := ioutil.ReadFile(*flagMainSrc)
+	    if err != nil {
+	        failf("failed to read main source file : %v\n", err)
+	    }
+	    mainSrcOverride = string(b)
+	}
+
 	env := map[string]string{
 		"GOROOT": "",
 		"GOPATH": "",
@@ -106,14 +114,6 @@ func main() {
 	} else {
 	    var re = regexp.MustCompile(`[^a-zA-Z0-9]`)
 	    outf = re.ReplaceAllString(pkg, `_`) + ".a"
-	}
-
-	if len(*flagMainSrc) > 0 {
-	    b, err := ioutil.ReadFile(*flagMainSrc)
-	    if err != nil {
-	        failf("failed to read main source file : %v\n", err)
-	    }
-	    mainSrcOverride = string(b)
 	}
 
 	buildInstrumentedBinary(outf, pkg, deps, lits, &blocks, &sonar)
