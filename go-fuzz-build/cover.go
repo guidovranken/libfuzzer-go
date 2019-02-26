@@ -837,9 +837,10 @@ func (f *File) newCounter(start, end token.Pos, numStmt int) ast.Stmt {
 		},
 		Index: idx,
 	}
-	return &ast.IncDecStmt{
-		X:   counter,
-		Tok: token.INC,
+	return &ast.AssignStmt{
+		Lhs: []ast.Expr{counter},
+		Tok: token.ASSIGN,
+        Rhs: []ast.Expr{ &ast.BasicLit{Kind: token.INT, Value: "1"} },
 	}
 }
 
